@@ -37,6 +37,8 @@ The generated `_metadata.txt` includes:
 
 📖 **How to Use**
 
+**Download the ZIP file** and extract it to your local storage. Keep all the files in one folder. Double-click on index.html to open the Ethos GPS Map Generator in your browser.
+
 **Locate:** Use the SEARCH box to find your flying site.
 
 **Frame:** Adjust the zoom level until your flying area is centered in the crosshair.
