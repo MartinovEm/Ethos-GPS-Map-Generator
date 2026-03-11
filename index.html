@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethos GPS Map Generator - Gold Master</title>
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
+    
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f0f0f; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; margin: 0; min-width: 820px; }
+        .header { width: 780px; display: flex; align-items: center; justify-content: flex-start; gap: 15px; margin-bottom: 5px; }
+        .logo-container { margin-top: 20px; }
+        .logo-container img { height: 75px; display: block; }
+        .header-title { margin: 0; margin-top: 10px; margin-left: -5px; color: #87b025; font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1; }
+        
+        .ui-panel { background: #1e1e1e; padding: 10px 15px; border-radius: 8px; margin: 5px 0; border: 1px solid #333; width: 780px; display: flex; flex-direction: column; gap: 8px; }
+        .row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
+        
+        .bounds-display { background: #0a0a0a; padding: 8px 12px; border-radius: 6px; border: 1px solid #444; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-family: 'Consolas', monospace; font-size: 0.85em; }
+        .coord-val { color: #87b025; font-weight: bold; }
+        
+        #wrapper { position: relative; border: 4px solid #444; border-radius: 4px; overflow: hidden; box-shadow: 0 0 25px rgba(135,176,37,0.25); margin-bottom: 15px; }
+        #map { width: 100%; height: 100%; background: #222; }
+        
+        #crosshair { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; pointer-events: none; z-index: 1001; opacity: 0.6; }
+        #crosshair:before, #crosshair:after { content: ''; position: absolute; background: #87b025; }
+        #crosshair:before { top: 19px; left: 0; width: 40px; height: 2px; }
+        #crosshair:after { top: 0; left: 19px; width: 2px; height: 40px; }
+        
+        #mouse-coords { position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.75); color: #ffffff; padding: 5px 10px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 11px; z-index: 1002; border: 1px solid #333; }
+        
+        .leaflet-control-scale-line { background: rgba(0, 0, 0, 0.7) !important; color: #ffffff !important; border: 2px solid #87b025 !important; border-top: none !important; font-weight: bold !important; text-shadow: 1px 1px #000; }
+        
+        .btn-group { display: flex; gap: 8px; }
+        button { padding: 8px 14px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 13px; }
+        .btn-bmp, .btn-meta { background: #333; color: #87b025; border: 1px solid #87b025; }
+        .btn-all { background: #87b025; color: #ffffff; border: 1px solid #87b025; }
+        
+        .zoom-lock-container { display: flex; align-items: center; gap: 8px; background: #111; padding: 0 10px; border-radius: 4px; border: 1px solid #444; height: 34px; }
+        .zoom-lock-label { font-size: 12px; font-weight: bold; color: #ccc; cursor: pointer; }
+        
+        .label { color: #888; font-size: 0.7em; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 1px; }
+        input, select { background: #111; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 4px; font-weight: bold; }
+        
+        .workflow-hint { font-size: 0.75em; color: #888; padding: 10px 0 20px 0; width: 780px; text-align: center; line-height: 1.6; border-top: 1px solid #333; }
+        .workflow-hint b { color: #87b025; }
+        
+        .leaflet-control-geocoder { background: #333 !important; border: 2px solid #87b025 !important; }
+        .leaflet-control-geocoder-icon { filter: invert(1) brightness(1.5); }
+        .leaflet-control-geocoder-alternatives { background-color: #222 !important; border: 1px solid #444 !important; border-radius: 4px; }
+        .leaflet-control-geocoder-alternatives a { color: #ffffff !important; font-weight: 600 !important; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container"><img src="ethos logo.png" alt="ETHOS" onerror="this.style.display='none';"></div>
+        <div><h2 class="header-title">Map Generator</h2></div>
+    </div>
+    <div class="ui-panel">
+        <div class="row">
+            <div><div class="label">Project Title</div><input type="text" id="mapTitle" value="Ethos_Map"></div>
+            <div><div class="label">Resolution</div><select id="resSelect" onchange="updateResolution()"><option value="800,480">800x480</option><option value="480,320">480x320</option></select></div>
+            <div><div class="label">Map Type</div><select id="layerSelect" onchange="updateLayer()"><option value="y" selected>Google Hybrid</option><option value="s">Satellite Only</option><option value="p">Terrain</option></select></div>
+            <div class="zoom-lock-container"><input type="checkbox" id="zoomLock" onchange="toggleZoomLock()"><label for="zoomLock" class="zoom-lock-label">Zoom Lock</label></div>
+            <div class="btn-group">
+                <button class="btn-meta" onclick="exportMetadata()">📄 Metadata</button>
+                <button class="btn-bmp" onclick="exportBMP()">💾 BMP</button>
+                <button class="btn-all" onclick="exportAll()">⚡ Export All</button>
+            </div>
+        </div>
+        <div class="bounds-display">
+            <div><div class="label">Latitude Boundary</div>North: <span class="coord-val" id="latNorth">0.0000</span> | South: <span class="coord-val" id="latSouth">0.0000</span></div>
+            <div><div class="label">Longitude Boundary</div>West: <span class="coord-val" id="lngWest">0.0000</span> | East: <span class="coord-val" id="lngEast">0.0000</span></div>
+        </div>
+    </div>
+    <div id="wrapper" style="width: 800px; height: 480px;"><div id="map"></div><div id="crosshair"></div><div id="mouse-coords">Lat: 0.0000, Lng: 0.0000</div></div>
+    
+    <div class="workflow-hint">
+        <b>Workflow:</b> Export BMP & Metadata Pack -> Transcode BMP via <b>Ethos Suite Image Manager</b>.<br>
+        Next Step: Copy result to <b>SD Card: /Bitmaps/GPS/</b> -> Configure Widget with Metadata.
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+    <script>
+        const map = L.map('map', { zoomControl: true, attributionControl: false }).setView([42.6977, 23.3219], 15);
+        let tileLayer;
+        L.control.scale({ imperial: false, metric: true, position: 'bottomleft' }).addTo(map);
+
+        function updateLayer() {
+            const type = document.getElementById('layerSelect').value;
+            if (tileLayer) map.removeLayer(tileLayer);
+            tileLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=' + type + '&x={x}&y={y}&z={z}&hl=en', {
+                maxZoom: 20, subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], crossOrigin: true 
+            }).addTo(map);
+        }
+        updateLayer();
+        L.Control.geocoder({ defaultMarkGeocode: false, position: 'topleft', placeholder: "SEARCH" }).on('markgeocode', e => map.fitBounds(e.geocode.bbox)).addTo(map);
+
+        function toggleZoomLock() {
+            const isLocked = document.getElementById('zoomLock').checked;
+            isLocked ? (map.scrollWheelZoom.disable(), map.doubleClickZoom.disable(), map.touchZoom.disable()) : (map.scrollWheelZoom.enable(), map.doubleClickZoom.enable(), map.touchZoom.enable());
+        }
+
+        function updateResolution() {
+            const [w, h] = document.getElementById('resSelect').value.split(',').map(Number);
+            document.getElementById('wrapper').style.width = w + "px";
+            document.getElementById('wrapper').style.height = h + "px";
+            setTimeout(() => { map.invalidateSize(); updateBounds(); }, 300);
+        }
+
+        map.on('mousemove', e => { document.getElementById('mouse-coords').innerHTML = `Lat: ${e.latlng.lat.toFixed(6)}, Lng: ${e.latlng.lng.toFixed(6)}`; });
+        function updateBounds() {
+            const b = map.getBounds();
+            document.getElementById('latNorth').innerText = b.getNorth().toFixed(8);
+            document.getElementById('latSouth').innerText = b.getSouth().toFixed(8);
+            document.getElementById('lngWest').innerText = b.getWest().toFixed(8);
+            document.getElementById('lngEast').innerText = b.getEast().toFixed(8);
+        }
+        map.on('moveend', updateBounds); updateBounds();
+
+        function toDMS(decimal, isLat) {
+            const absolute = Math.abs(decimal); const degrees = Math.floor(absolute);
+            const minutes = Math.floor((absolute - degrees) * 60);
+            const seconds = (((absolute - degrees) * 60 - minutes) * 60).toFixed(2);
+            return `${degrees}° ${minutes}' ${seconds}" ${isLat ? (decimal >= 0 ? "N" : "S") : (decimal >= 0 ? "E" : "W")}`;
+        }
+
+        function getFileName(ext) {
+            const base = document.getElementById('mapTitle').value.trim().replace(/[^a-z0-9]/gi, '_');
+            const now = new Date();
+            const ts = now.toISOString().split('T')[0] + "_" + now.getHours().toString().padStart(2, '0') + "-" + now.getMinutes().toString().padStart(2, '0');
+            return `${base}_Z${map.getZoom()}_${ts}${ext}`;
+        }
+
+        function createMetadataBlob() {
+            const n = parseFloat(document.getElementById('latNorth').innerText);
+            const s = parseFloat(document.getElementById('latSouth').innerText);
+            const west = parseFloat(document.getElementById('lngWest').innerText);
+            const east = parseFloat(document.getElementById('lngEast').innerText);
+            const [resW, resH] = document.getElementById('resSelect').value.split(',');
+
+            return new Blob([`MAP METADATA: ${document.getElementById('mapTitle').value}
+Generated: ${new Date().toLocaleString()}
+Resolution: ${resW} x ${resH} pixels
+
+LATITUDE RANGE (North to South)
+-------------------------------
+Start (North): ${toDMS(n, true)}
+End   (South): ${toDMS(s, true)}
+
+LONGITUDE RANGE (East to West)
+-------------------------------
+Start (West):  ${toDMS(east, false)}
+End   (East):  ${toDMS(west, false)}
+
+GEODATA (Decimal)
+-----------------
+N: ${n.toFixed(8)} | S: ${s.toFixed(8)}
+W: ${east.toFixed(8)} | E: ${west.toFixed(8)}
+
+Zoom Level: ${map.getZoom()}`], { type: 'text/plain' });
+        }
+
+        async function createBMPBlob() {
+            const [w, h] = document.getElementById('resSelect').value.split(',').map(Number);
+            const hud = document.querySelectorAll('.leaflet-control, #mouse-coords');
+            hud.forEach(el => el.style.display = 'none');
+            const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, width: w, height: h, scale: 1 });
+            hud.forEach(el => el.style.display = 'block');
+            const data = canvas.getContext('2d').getImageData(0, 0, w, h).data;
+            const padding = (4 - (w * 3) % 4) % 4;
+            const fileSize = 54 + (w * 3 + padding) * h;
+            const buffer = new ArrayBuffer(fileSize), view = new DataView(buffer);
+            view.setUint16(0, 0x424D, false); view.setUint32(2, fileSize, true); view.setUint32(10, 54, true);
+            view.setUint32(14, 40, true); view.setInt32(18, w, true); view.setInt32(22, h, true);
+            view.setUint16(26, 1, true); view.setUint16(28, 24, true); view.setUint32(30, 0, true);
+            let offset = 54;
+            for (let y = h - 1; y >= 0; y--) {
+                for (let x = 0; x < w; x++) {
+                    const i = (y * w + x) * 4;
+                    view.setUint8(offset++, data[i + 2]); view.setUint8(offset++, data[i + 1]); view.setUint8(offset++, data[i]);
+                }
+                for (let p = 0; p < padding; p++) view.setUint8(offset++, 0);
+            }
+            return new Blob([buffer], { type: "image/bmp" });
+        }
+
+        function downloadFile(blob, extension) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = getFileName(extension);
+            document.body.appendChild(a); a.click();
+            document.body.removeChild(a); URL.revokeObjectURL(url);
+        }
+
+        async function exportMetadata() { downloadFile(createMetadataBlob(), "_metadata.txt"); }
+        async function exportBMP() { const blob = await createBMPBlob(); downloadFile(blob, ".bmp"); }
+        async function exportAll() { 
+            downloadFile(createMetadataBlob(), "_metadata.txt");
+            const blob = await createBMPBlob(); 
+            setTimeout(() => downloadFile(blob, ".bmp"), 300);
+        }
+    </script>
+</body>
+</html>
