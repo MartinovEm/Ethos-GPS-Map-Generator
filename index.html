@@ -3,54 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ethos GPS Map Generator - Gold Master</title>
+    <title>Ethos GPS Map Generator - Sync Pro</title>
     
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css" />
     
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f0f0f; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; margin: 0; min-width: 820px; }
-        .header { width: 780px; display: flex; align-items: center; justify-content: flex-start; gap: 15px; margin-bottom: 5px; }
-        .logo-container { margin-top: 20px; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f0f0f; color: #fff; display: flex; flex-direction: column; align-items: center; padding: 10px 5px; margin: 0; min-width: 1000px; }
+        .header { width: 980px; display: flex; align-items: center; justify-content: flex-start; gap: 15px; padding-top: 20px; margin-bottom: 5px; }
         .logo-container img { height: 75px; display: block; }
-        .header-title { margin: 0; margin-top: 10px; margin-left: -5px; color: #87b025; font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1; }
-        
-        .ui-panel { background: #1e1e1e; padding: 10px 15px; border-radius: 8px; margin: 5px 0; border: 1px solid #333; width: 780px; display: flex; flex-direction: column; gap: 8px; }
+        .header-title { margin: -10px 0 0 -6px; color: #87b025; font-size: 30px; font-weight: 700; text-transform: uppercase; line-height: 1; }
+        .ui-panel { background: #1e1e1e; padding: 10px 15px; border-radius: 8px; margin: 5px 0; border: 1px solid #333; width: 950px; display: flex; flex-direction: column; gap: 8px; }
         .row { display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; }
-        
         .bounds-display { background: #0a0a0a; padding: 8px 12px; border-radius: 6px; border: 1px solid #444; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-family: 'Consolas', monospace; font-size: 0.85em; }
         .coord-val { color: #87b025; font-weight: bold; }
-        
-        #wrapper { position: relative; border: 4px solid #444; border-radius: 4px; overflow: hidden; box-shadow: 0 0 25px rgba(135,176,37,0.25); margin-bottom: 15px; }
-        #map { width: 100%; height: 100%; background: #222; }
-        
+        .content-container { display: flex; gap: 15px; align-items: flex-start; margin-bottom: 15px; width: 980px; justify-content: center; }
+        #wrapper { position: relative; border: 4px solid #444; border-radius: 4px; overflow: hidden; box-shadow: 0 0 25px rgba(135,176,37,0.2); background: #000; }
+        #map { width: 100%; height: 100%; background: #000; }
+        .info-box { width: 150px; background: #111; border: 1px solid #333; border-radius: 6px; padding: 12px; font-size: 0.75em; line-height: 1.4; color: #bbb; }
+        .info-box h4 { margin: 0 0 8px 0; color: #87b025; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; border-bottom: 1px solid #333; padding-bottom: 4px; }
+        .info-item { margin-bottom: 10px; }
+        .info-item b { color: #fff; display: block; margin-bottom: 2px; }
         #crosshair { position: absolute; top: 50%; left: 50%; width: 40px; height: 40px; margin-left: -20px; margin-top: -20px; pointer-events: none; z-index: 1001; opacity: 0.6; }
         #crosshair:before, #crosshair:after { content: ''; position: absolute; background: #87b025; }
         #crosshair:before { top: 19px; left: 0; width: 40px; height: 2px; }
         #crosshair:after { top: 0; left: 19px; width: 2px; height: 40px; }
-        
-        #mouse-coords { position: absolute; bottom: 10px; right: 10px; background: rgba(0, 0, 0, 0.75); color: #ffffff; padding: 5px 10px; border-radius: 4px; font-family: 'Consolas', monospace; font-size: 11px; z-index: 1002; border: 1px solid #333; }
-        
-        .leaflet-control-scale-line { background: rgba(0, 0, 0, 0.7) !important; color: #ffffff !important; border: 2px solid #87b025 !important; border-top: none !important; font-weight: bold !important; text-shadow: 1px 1px #000; }
-        
-        .btn-group { display: flex; gap: 8px; }
-        button { padding: 8px 14px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 6px; font-size: 13px; }
-        .btn-bmp, .btn-meta { background: #333; color: #87b025; border: 1px solid #87b025; }
+        .leaflet-control-scale-line, #mouse-coords { background: rgba(0, 0, 0, 0.7) !important; color: #ffffff !important; border: 2px solid #87b025 !important; border-top: none !important; font-weight: bold !important; text-shadow: 1px 1px #000; }
+        #mouse-coords { position: absolute; bottom: 0px; right: 0px; padding: 2px 8px; border-right: none; font-family: 'Consolas', monospace; font-size: 11px; z-index: 1002; }
+        .btn-group { display: flex; gap: 6px; }
+        button { padding: 8px 12px; cursor: pointer; border: none; border-radius: 4px; font-weight: bold; transition: 0.2s; display: flex; align-items: center; gap: 5px; font-size: 11px; }
+        .btn-link { background: #e67e22; color: #fff; border: 1px solid #d35400; }
+        .btn-meta { background: #333; color: #fff; border: 1px solid #555; }
+        .btn-16 { background: #333; color: #87b025; border: 1px solid #87b025; }
+        .btn-24 { background: #333; color: #3498db; border: 1px solid #3498db; }
         .btn-all { background: #87b025; color: #ffffff; border: 1px solid #87b025; }
-        
+        button:hover { opacity: 0.8; transform: translateY(-1px); }
+        .linked { background: #27ae60 !important; border-color: #2ecc71 !important; }
         .zoom-lock-container { display: flex; align-items: center; gap: 8px; background: #111; padding: 0 10px; border-radius: 4px; border: 1px solid #444; height: 34px; }
-        .zoom-lock-label { font-size: 12px; font-weight: bold; color: #ccc; cursor: pointer; }
-        
         .label { color: #888; font-size: 0.7em; text-transform: uppercase; margin-bottom: 2px; letter-spacing: 1px; }
         input, select { background: #111; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 4px; font-weight: bold; }
-        
-        .workflow-hint { font-size: 0.75em; color: #888; padding: 10px 0 20px 0; width: 780px; text-align: center; line-height: 1.6; border-top: 1px solid #333; }
-        .workflow-hint b { color: #87b025; }
-        
         .leaflet-control-geocoder { background: #333 !important; border: 2px solid #87b025 !important; }
         .leaflet-control-geocoder-icon { filter: invert(1) brightness(1.5); }
-        .leaflet-control-geocoder-alternatives { background-color: #222 !important; border: 1px solid #444 !important; border-radius: 4px; }
-        .leaflet-control-geocoder-alternatives a { color: #ffffff !important; font-weight: 600 !important; }
     </style>
 </head>
 <body>
@@ -60,26 +53,35 @@
     </div>
     <div class="ui-panel">
         <div class="row">
-            <div><div class="label">Project Title</div><input type="text" id="mapTitle" value="Ethos_Map"></div>
+            <div><div class="label">Project Title (Max 11)</div><input type="text" id="mapTitle" value="EthosMap" maxlength="11"></div>
             <div><div class="label">Resolution</div><select id="resSelect" onchange="updateResolution()"><option value="800,480">800x480</option><option value="480,320">480x320</option></select></div>
-            <div><div class="label">Map Type</div><select id="layerSelect" onchange="updateLayer()"><option value="y" selected>Google Hybrid</option><option value="s">Satellite Only</option><option value="p">Terrain</option></select></div>
-            <div class="zoom-lock-container"><input type="checkbox" id="zoomLock" onchange="toggleZoomLock()"><label for="zoomLock" class="zoom-lock-label">Zoom Lock</label></div>
+            <div class="zoom-lock-container"><input type="checkbox" id="zoomLock" onchange="toggleZoomLock()"><label for="zoomLock" style="font-size:12px; font-weight:bold; color:#ccc; cursor:pointer;">Zoom Lock</label></div>
             <div class="btn-group">
-                <button class="btn-meta" onclick="exportMetadata()">📄 Metadata</button>
-                <button class="btn-bmp" onclick="exportBMP()">💾 BMP</button>
-                <button class="btn-all" onclick="exportAll()">⚡ Export All</button>
+                <button class="btn-link" id="linkBtn" onclick="linkSDCard()">🔗 Link SD Card</button>
+                <button class="btn-meta" onclick="handleMeta()">📄 Meta</button>
+                <button class="btn-16" onclick="handleDirect()">💾 Direct</button>
+                <button class="btn-24" onclick="exportBMP(24)">💾 Suite</button>
+                <button class="btn-all" onclick="handleExtractAll()">⚡ Extract All</button>
             </div>
         </div>
-        <div class="bounds-display">
-            <div><div class="label">Latitude Boundary</div>North: <span class="coord-val" id="latNorth">0.0000</span> | South: <span class="coord-val" id="latSouth">0.0000</span></div>
-            <div><div class="label">Longitude Boundary</div>West: <span class="coord-val" id="lngWest">0.0000</span> | East: <span class="coord-val" id="lngEast">0.0000</span></div>
+        <div class="row" style="margin-top: 5px;">
+            <div><div class="label">Map Type</div><select id="layerSelect" style="width: 200px;" onchange="updateLayer()"><option value="y" selected>Google Hybrid</option><option value="s">Satellite Only</option><option value="p">Terrain</option></select></div>
+            <div class="bounds-display" style="width: 705px;">
+                <div><div class="label">Latitude Boundary</div>N: <span class="coord-val" id="latNorth">0.0000</span> | S: <span class="coord-val" id="latSouth">0.0000</span></div>
+                <div><div class="label">Longitude Boundary</div>W: <span class="coord-val" id="lngWest">0.0000</span> | E: <span class="coord-val" id="lngEast">0.0000</span></div>
+            </div>
         </div>
     </div>
-    <div id="wrapper" style="width: 800px; height: 480px;"><div id="map"></div><div id="crosshair"></div><div id="mouse-coords">Lat: 0.0000, Lng: 0.0000</div></div>
-    
-    <div class="workflow-hint">
-        <b>Workflow:</b> Export BMP & Metadata Pack -> Transcode BMP via <b>Ethos Suite Image Manager</b>.<br>
-        Next Step: Copy result to <b>SD Card: /Bitmaps/GPS/</b> -> Configure Widget with Metadata.
+    <div class="content-container">
+        <div id="wrapper" style="width: 800px; height: 480px;"><div id="map"></div><div id="crosshair"></div><div id="mouse-coords">Lat: 0.0000, Lng: 0.0000</div></div>
+        <div class="info-box">
+            <h4>Export Guide</h4>
+            <div class="info-item"><b>Meta:</b> Configuration text file for the GPS widget settings.</div>
+            <div class="info-item"><b>Direct:</b> 16-bit BMP. Saved as Title.bmp directly to Radio.</div>
+            <div class="info-item"><b>Suite:</b> 24-bit BMP. Best for Ethos Suite processing.</div>
+            <div class="info-item"><b>Extract All:</b> Syncs Meta + 16-bit BMP in one click.</div>
+            <div class="info-item" style="border-top: 1px solid #333; padding-top: 5px;"><b>Link SD Card:</b> Syncs files directly to Radio Folders.</div>
+        </div>
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -88,7 +90,7 @@
 
     <script>
         const map = L.map('map', { zoomControl: true, attributionControl: false }).setView([42.6977, 23.3219], 15);
-        let tileLayer;
+        let tileLayer, sdHandle = null;
         L.control.scale({ imperial: false, metric: true, position: 'bottomleft' }).addTo(map);
 
         function updateLayer() {
@@ -99,7 +101,10 @@
             }).addTo(map);
         }
         updateLayer();
-        L.Control.geocoder({ defaultMarkGeocode: false, position: 'topleft', placeholder: "SEARCH" }).on('markgeocode', e => map.fitBounds(e.geocode.bbox)).addTo(map);
+
+        L.Control.geocoder({ defaultMarkGeocode: false, position: 'topleft', placeholder: "SEARCH",
+            geocoder: L.Control.Geocoder.nominatim({ serviceUrl: 'https://nominatim.openstreetmap.org/' })
+        }).on('markgeocode', e => map.fitBounds(e.geocode.bbox)).addTo(map);
 
         function toggleZoomLock() {
             const isLocked = document.getElementById('zoomLock').checked;
@@ -123,6 +128,68 @@
         }
         map.on('moveend', updateBounds); updateBounds();
 
+        function resetLinkButton() {
+            sdHandle = null;
+            const btn = document.getElementById('linkBtn');
+            btn.innerText = "🔗 Link SD Card";
+            btn.classList.remove('linked');
+        }
+
+        async function linkSDCard() {
+            try {
+                sdHandle = await window.showDirectoryPicker();
+                document.getElementById('linkBtn').innerText = "✅ SD Linked";
+                document.getElementById('linkBtn').classList.add('linked');
+                
+                // Active Pulse Check: Tries to query the directory entries. 
+                // If the drive is pulled, this will throw an error and reset the button.
+                const checkStatus = setInterval(async () => {
+                    if (!sdHandle) { clearInterval(checkStatus); return; }
+                    try {
+                        // We iterate the directory. If it's disconnected, this async iterator fails.
+                        const it = sdHandle.entries();
+                        await it.next(); 
+                    } catch (e) {
+                        resetLinkButton();
+                        clearInterval(checkStatus);
+                    }
+                }, 1500);
+                
+            } catch (err) { console.error("SD Link failed", err); }
+        }
+
+        async function saveToSD(blob, folderPath, fileName) {
+            if (!sdHandle) return false;
+            try {
+                let currentHandle = sdHandle;
+                const folders = folderPath.split('/').filter(f => f.length > 0);
+                for (const folder of folders) { currentHandle = await currentHandle.getDirectoryHandle(folder, { create: true }); }
+                const fileHandle = await currentHandle.getFileHandle(fileName, { create: true });
+                const writable = await fileHandle.createWritable();
+                await writable.write(blob); await writable.close();
+                return true;
+            } catch (err) { 
+                resetLinkButton();
+                return false; 
+            }
+        }
+
+        async function handleMeta() {
+            const blob = createMetadataBlob();
+            const name = getFileName("_metadata.txt");
+            if (sdHandle) { if (await saveToSD(blob, "documents/user", name)) return; }
+            downloadFile(blob, name);
+        }
+
+        async function handleDirect() {
+            const blob = await createBMPBlob(16);
+            const name = document.getElementById('mapTitle').value.trim().replace(/[^a-z0-9]/gi, '_') + ".bmp";
+            if (sdHandle) { if (await saveToSD(blob, "bitmaps/GPS", name)) return; }
+            downloadFile(blob, name);
+        }
+
+        async function handleExtractAll() { await handleMeta(); setTimeout(async () => { await handleDirect(); }, 500); }
+
         function toDMS(decimal, isLat) {
             const absolute = Math.abs(decimal); const degrees = Math.floor(absolute);
             const minutes = Math.floor((absolute - degrees) * 60);
@@ -138,12 +205,9 @@
         }
 
         function createMetadataBlob() {
-            const n = parseFloat(document.getElementById('latNorth').innerText);
-            const s = parseFloat(document.getElementById('latSouth').innerText);
-            const west = parseFloat(document.getElementById('lngWest').innerText);
-            const east = parseFloat(document.getElementById('lngEast').innerText);
+            const b = map.getBounds();
+            const n = b.getNorth(), s = b.getSouth(), w = b.getWest(), e = b.getEast();
             const [resW, resH] = document.getElementById('resSelect').value.split(',');
-
             return new Blob([`MAP METADATA: ${document.getElementById('mapTitle').value}
 Generated: ${new Date().toLocaleString()}
 Resolution: ${resW} x ${resH} pixels
@@ -155,56 +219,72 @@ End   (South): ${toDMS(s, true)}
 
 LONGITUDE RANGE (East to West)
 -------------------------------
-Start (West):  ${toDMS(east, false)}
-End   (East):  ${toDMS(west, false)}
+Start (West):  ${toDMS(e, false)}
+End   (East):  ${toDMS(w, false)}
 
 GEODATA (Decimal)
 -----------------
 N: ${n.toFixed(8)} | S: ${s.toFixed(8)}
-W: ${east.toFixed(8)} | E: ${west.toFixed(8)}
+W: ${e.toFixed(8)} | E: ${w.toFixed(8)}
 
 Zoom Level: ${map.getZoom()}`], { type: 'text/plain' });
         }
 
-        async function createBMPBlob() {
+        async function createBMPBlob(depth) {
             const [w, h] = document.getElementById('resSelect').value.split(',').map(Number);
             const hud = document.querySelectorAll('.leaflet-control, #mouse-coords');
             hud.forEach(el => el.style.display = 'none');
-            const canvas = await html2canvas(document.getElementById('map'), { useCORS: true, width: w, height: h, scale: 1 });
+            
+            const mapEl = document.getElementById('map');
+            const originalStyle = mapEl.getAttribute('style');
+            mapEl.style.width = (w + 10) + 'px';
+            mapEl.style.height = (h + 10) + 'px';
+            map.invalidateSize(false);
+
+            const rawCanvas = await html2canvas(mapEl, { 
+                useCORS: true, width: w + 10, height: h + 10, scale: 1, backgroundColor: '#000000'
+            });
+            
+            mapEl.setAttribute('style', originalStyle);
+            map.invalidateSize(false);
             hud.forEach(el => el.style.display = 'block');
-            const data = canvas.getContext('2d').getImageData(0, 0, w, h).data;
-            const padding = (4 - (w * 3) % 4) % 4;
-            const fileSize = 54 + (w * 3 + padding) * h;
+
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = w;
+            finalCanvas.height = h;
+            const finalCtx = finalCanvas.getContext('2d');
+            finalCtx.drawImage(rawCanvas, 2, 2, w, h, 0, 0, w, h);
+
+            const imgData = finalCtx.getImageData(0, 0, w, h).data;
+            const bytesPerPixel = (depth === 16) ? 2 : 3;
+            const padding = (4 - (w * bytesPerPixel) % 4) % 4;
+            const fileSize = 54 + (w * bytesPerPixel + padding) * h;
             const buffer = new ArrayBuffer(fileSize), view = new DataView(buffer);
             view.setUint16(0, 0x424D, false); view.setUint32(2, fileSize, true); view.setUint32(10, 54, true);
             view.setUint32(14, 40, true); view.setInt32(18, w, true); view.setInt32(22, h, true);
-            view.setUint16(26, 1, true); view.setUint16(28, 24, true); view.setUint32(30, 0, true);
+            view.setUint16(26, 1, true); view.setUint16(28, depth, true); view.setUint32(30, 0, true);
             let offset = 54;
             for (let y = h - 1; y >= 0; y--) {
                 for (let x = 0; x < w; x++) {
                     const i = (y * w + x) * 4;
-                    view.setUint8(offset++, data[i + 2]); view.setUint8(offset++, data[i + 1]); view.setUint8(offset++, data[i]);
+                    if (depth === 16) {
+                        const r = (imgData[i] >> 3) & 0x1F; const g = (imgData[i+1] >> 2) & 0x3F; const b = (imgData[i+2] >> 3) & 0x1F;
+                        view.setUint16(offset, (r << 11) | (g << 5) | b, true); offset += 2;
+                    } else {
+                        view.setUint8(offset++, imgData[i + 2]); view.setUint8(offset++, imgData[i + 1]); view.setUint8(offset++, imgData[i]);
+                    }
                 }
                 for (let p = 0; p < padding; p++) view.setUint8(offset++, 0);
             }
             return new Blob([buffer], { type: "image/bmp" });
         }
 
-        function downloadFile(blob, extension) {
+        function downloadFile(blob, filename) {
             const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url; a.download = getFileName(extension);
-            document.body.appendChild(a); a.click();
-            document.body.removeChild(a); URL.revokeObjectURL(url);
+            const a = document.createElement('a'); a.href = url; a.download = filename;
+            document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
         }
-
-        async function exportMetadata() { downloadFile(createMetadataBlob(), "_metadata.txt"); }
-        async function exportBMP() { const blob = await createBMPBlob(); downloadFile(blob, ".bmp"); }
-        async function exportAll() { 
-            downloadFile(createMetadataBlob(), "_metadata.txt");
-            const blob = await createBMPBlob(); 
-            setTimeout(() => downloadFile(blob, ".bmp"), 300);
-        }
+        async function exportBMP(depth) { downloadFile(await createBMPBlob(depth), getFileName(".bmp")); }
     </script>
 </body>
 </html>
