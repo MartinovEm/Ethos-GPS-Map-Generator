@@ -58,3 +58,15 @@ The generated `_metadata.txt` includes:
 ![Coordinates_Ethos](https://github.com/user-attachments/assets/35171816-a20f-4991-b2a8-8ef600715bb8)
 
 ![Map_accuracy](https://github.com/user-attachments/assets/5ec89c74-d227-4e19-910d-f94d4404befb)
+
+🛠️**Tips for quick access to the coordinates of your flying field**
+
+Your Tandem radio can read .txt documents. To do this, create a Documents folder in the root of the Radio storage (or SD card). Create a User subfolder where you will place all the _metadata.txt files for all the map .bmp files you will be using. This way, you will always have quick access to the coordinates of all the fields you fly to.
+
+RADIO:/documents/user
+
+![File manager](https://github.com/user-attachments/assets/14256bb3-ecc8-41fa-9f13-2e8cc469b153)
+
+![TXT document reading from the radio](https://github.com/user-attachments/assets/ee8009ff-7dd1-4cce-8790-ab8a2c7e3ae2)
+
+
