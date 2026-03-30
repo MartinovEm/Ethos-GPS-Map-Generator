@@ -104,15 +104,17 @@ When you export a map, the generator produces the following files:
 
 #### Setting coordinates in the built-in GPS Map Widget:
 
-![Coordinates_Ethos](https://github.com/user-attachments/assets/35171816-a20f-4991-b2a8-8ef600715bb8)
+<img width="1318" height="601" alt="Coordinates in GPS Map Widget" src="https://github.com/user-attachments/assets/c1341d1e-2c6c-4ba9-b663-ae25bb8448ca" />
 
 #### OR
 
 * **Use on the radio:** Look at the metadata file in `RADIO:/documents/user` and **manually** enter the coordinates in the corresponding fields in the widget settings.
 
-![File manager](https://github.com/user-attachments/assets/14256bb3-ecc8-41fa-9f13-2e8cc469b153)
+<img width="800" height="480" alt="Doc_user_files" src="https://github.com/user-attachments/assets/3f700753-6fb0-4108-8b50-4f393108e9f6" />
 
-![TXT document reading from the radio](https://github.com/user-attachments/assets/ee8009ff-7dd1-4cce-8790-ab8a2c7e3ae2)
+<img width="800" height="480" alt="metadata_in_radio" src="https://github.com/user-attachments/assets/ca04301a-6cc1-4713-9794-830dab1fb552" />
+
+
 
 ---
 
