@@ -362,7 +362,7 @@ Zoom Level: ${map.getZoom()}`], { type: 'text/plain' });
             const bmpBlob = await createBMPBlob(16);
             const jsonBlob = createJsonBlob();
             const metaBlob = createMetadataBlob();
-            const metaName = baseName + '_metadata.txt';
+            const metaName = baseName + '_z' + map.getZoom() + '_metadata.txt';
             const bmpOk = await saveToSD(bmpBlob, 'bitmaps/GPS', baseName + '.bmp');
             const jsonOk = await saveToSD(jsonBlob, 'documents/user', baseName + '.json');
             const metaOk = await saveToSD(metaBlob, 'documents/user', metaName);
@@ -378,7 +378,7 @@ Zoom Level: ${map.getZoom()}`], { type: 'text/plain' });
             const zip = new JSZip();
             zip.file(baseName + '.bmp', bmpBlob);
             zip.file(baseName + '.json', jsonBlob);
-            zip.file(baseName + '_metadata.txt', metaBlob);
+            zip.file(baseName + '_z' + map.getZoom() + '_metadata.txt', metaBlob);
             const zipBlob = await zip.generateAsync({ type: 'blob' });
             downloadFile(zipBlob, baseName + '.zip');
         }

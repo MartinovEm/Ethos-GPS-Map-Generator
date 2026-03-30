@@ -72,13 +72,13 @@ When you export a map, the generator produces the following files:
 |---|---|---|---|
 | `ProjectName.bmp` | `/bitmaps/GPS/` | Both | The map image (16-bit BMP for Ethos radios) |
 | `ProjectName.json` | `/documents/user/` | **GPS AccuMap** | Map boundaries — **loaded automatically** by GPS AccuMap |
-| `_metadata.txt` | `/documents/user/` | Ethos GPS Map | Coordinates for the built-in widget — **must be entered manually** |
+| `ProjectName_zZOOM_metadata.txt` | `/documents/user/` | Ethos GPS Map | Coordinates for the built-in widget — **must be entered manually** |
 
 **For [GPS AccuMap](https://github.com/MartinovEm/Ethos-GPS-AccuMap):**
 - Just select your map in the widget — coordinates are loaded automatically from the JSON file. No manual entry needed!
 
 **For Ethos GPS Map widget:**
-- You must open `_metadata.txt` and **manually** enter the North, South, East, and West coordinates into the widget settings.
+- You must open the `_metadata.txt` file (e.g., `MyField_z15_metadata.txt`) and **manually** enter the North, South, East, and West coordinates into the widget settings.
 
 * **Link SD Card**: Connect your radio via USB (Storage Mode). Click **🔗 Link SD Card** and select the root of your radio's SD drive.
 * **Sync To SD**: Click the **⚡ Sync To SD** button. This will generate and save the 16-bit BMP, JSON coordinates, and metadata in one click.
@@ -99,7 +99,7 @@ When you export a map, the generator produces the following files:
 * The `.json` file is all you need. The widget reads map boundaries and coordinates **automatically** — no manual entry, no risk of errors. Just select your map and fly.
 
 #### For Ethos GPS Map widget:
-* **Purpose:** The `_metadata.txt` file is your "Cheat Sheet" for the radio settings.
+* **Purpose:** The `_metadata.txt` file (named `ProjectName_zZOOM_metadata.txt`, e.g., `MyField_z15_metadata.txt`) is your "Cheat Sheet" for the radio settings.
 * **Use on PC:** Open this file on your PC and keep it visible while you are on your Radio's **GPS Map Widget Settings page.** **Manually** enter the **DMS (Degrees, Minutes, Seconds)** values into the corresponding North, South, East, and West fields in the widget.
 
 #### Setting coordinates in the built-in GPS Map Widget:
@@ -118,10 +118,10 @@ When you export a map, the generator produces the following files:
 
 ### Final Verification Checklist
 
-* **Sync:** Ensure the `.bmp` is in `/bitmaps/GPS/` and the `.json` (for GPS AccuMap) or `_metadata.txt` (for the built-in widget) is in `/documents/user/`.
+* **Sync:** Ensure the `.bmp` is in `/bitmaps/GPS/` and the `.json` (for GPS AccuMap) or `_metadata.txt` file (for the built-in widget) is in `/documents/user/`.
 * **Widget:**
     * For GPS AccuMap: Just select your map — coordinates are loaded automatically.
-    * For Ethos GPS Map: **Manually** enter the N, S, E and W coordinates from `_metadata.txt` as shown in the picture above.
+    * For Ethos GPS Map: **Manually** enter the N, S, E and W coordinates from the `_metadata.txt` file as shown in the picture above.
 * **Accuracy:** If your "Home" icon doesn't match your physical location, double-check that you didn't swap the North/South or East/West values when typing them into the radio (manual entry only needed for the built-in widget).
 
 #### Example of accuracy:
@@ -140,7 +140,7 @@ When you export your files:
 
 **Metadata Files:**
 * **`.json`** — Used by GPS AccuMap for **automatic** coordinate loading.
-* **`_metadata.txt`** — Used by the built-in Ethos GPS Map widget — coordinates must be entered **manually**.
+* **`ProjectName_zZOOM_metadata.txt`** — Used by the built-in Ethos GPS Map widget — coordinates must be entered **manually**. The filename includes the project name and zoom level (e.g., `MyField_z15_metadata.txt`).
 
 ---
 
